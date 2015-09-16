@@ -1,0 +1,14 @@
+def T(H, Cpave):
+    Tref = 0
+    return Tref + H/Cpave
+#Converts enthalpy to temperature.
+# The specific heat can be temperature dependent.
+# The reference temperature is assumed to be 0 C.
+
+#example of H2T
+#import numpy as np
+# the dummy arrays are created to test the T fuction
+#H = np.array([55,30,70,45])
+#Cpave = np.array([5,6,10,9])
+#T = T(H, Cpave)
+#print T
