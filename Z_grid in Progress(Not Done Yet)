@@ -1,0 +1,57 @@
+#def Z_grid (zfuL, zfdL, typL, nL, pos):
+import numpy as np
+n = 4
+nlayers = len(typL)
+nL = np.ones(n) + 1.5 
+if nL[0]%1 != 0.5:
+    print(' ')
+    print('Error: Z_grid.m')
+    print('Upper physical layer needs to include a 1/2-CV.  Thus, nL(1) ')
+    print('should be a number like 1.5, 2.5, 4.5, etc.')
+j = 1
+Dz = (zfdL[0] - zfuL[0]) / nL[0]
+zf = [zfuL[0], zfuL[0] + 0.5*Dz]
+zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz)
+zf = zf = np.concatenate((zf, zfx)) 
+n = len(zf) - 1
+for i in range(1,n):
+    typ[i] = typL[0]
+nn = n
+for j in range(1, nlayers):
+    Dz = (zfdL[j] - zfuL[j]) / nL[j]
+    zfx = np.arange(zfuL[j] + Dz, zfdL[j], Dz)
+    zf = np.concatenate((zf,zfx))
+    n = len(zf) - 1
+    for i in (nn+1, n):
+        typ[i] = typL[j]
+        print typL[j],j,i,typ[i]
+    nn = n
+N = len(zf) - 1
+
+# example of Z_grid
+#j = 1
+#n = 4
+#nL = np.ones(n) + 1.5
+#typL = np.ones(n) + 2
+#nlayers = len(typL)
+#zfdL = np.ones(n) + 1
+#zfuL = np.ones(n)
+#Dz = (zfdL[0] - zfuL[0]) / nL[0]
+#zf = [zfuL[0], zfuL[0] + 0.5*Dz]
+#zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz)
+#zf = np.concatenate((zf, zfx))
+#n = len(zf) - 1
+#typ = np.zeros(10) 
+#for i in range(1,n):
+    #typ[i] = typL[0]
+#nn = n
+#for j in range(1,nlayers):
+    #Dz = (zfdL[j] - zfuL[j]) / nL[j]
+    #zfx = np.arange(zfuL[j] + Dz, zfdL[j], Dz)
+    #zf = np.concatenate((zf,zfx))
+    #n = len(zf) - 1
+    #for i in (nn+1, n):
+        #typ[i] = typL[j]
+        #print typL[j],j,i,typ[i]
+    #nn = n
+#N = len(zf) - 1
