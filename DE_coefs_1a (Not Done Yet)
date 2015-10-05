@@ -7,7 +7,7 @@ aUp = np.zeros(N)
 aPp = np.zeros(N)
 aDp = np.zeros(N)
 b = np.zeros(N)
-for k in range(1,N-2):
+for k in range(1,N-1):
     aU[k] = dtf * Kedz[k] / cpave[k-1]
     aUp[k] = dt1mf * Kedz[k] / cpave[k-1]
     aD[k] = dtf * Kedz[k+1] / cpave[k+1]
