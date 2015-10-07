@@ -1,5 +1,12 @@
+def DE_coefs_1b(dtf,dt1mf,DzC,Kedz,QS,qb,qbn):
+    return aU,aP,aD,aUp,aPp,aDp,b
 import numpy as np
 N = 4
+Kedz = np.zeros(N)
+DzC = np.zeros(N)+4
+QS = np.zeros(N)+1
+qb = 5
+qbn = 8
 aU = np.zeros(N)
 aP = np.zeros(N)
 aD = np.zeros(N)
@@ -48,3 +55,4 @@ b[k] = QS[k] - dtf*qb - dt1mf*qbn
 #aP[k] = DzC[k] + dtf * Kedz[k]
 #aPp[k] = DzC[k] - dt1mf * Kedz[k]
 #b[k] = QS[k] - dtf*qb - dt1mf*qbn
+#DE_coefs_1b(dtf,dt1mf,DzC,Kedz,QS,qb,qbn)
