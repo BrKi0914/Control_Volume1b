@@ -1,5 +1,73 @@
 def init_T(N,t,spaceP,TpropP,QS,sourceP,bcP,testP,init_opt):
+    T = np.zeros(N)
+    if init_opt == 1:
+        print ('')
+        a1 = []
+        a2 = []
+        Tzname = ('Type name of initial temperature profile: ','s')
+        fid = open('Tzname.txt','r')
+        header1 = fid.readline()
+        header2 = fid.readline()
+        header3 = fid.readline()
+        par = fid.readline()
+        k = par.find (' ')
+        s1 = (par[0:k].strip())
+        s2 = (par[k:len(par)].strip())
+        wk=[float(s1),float(s2)]
+        count = len(wk)
+        fid.close()
+        wk = np.conjugate(wk)
+        zA = wk[:1]
+        TzA = wk[1:]
+    if init_opt == 2:
+        J = np.zeros(N+1)
+        J[4] = -qb
+        for i in range(N-1,-1,-1):
+            J[i] = J[i+1] - QS[i]
+            Kedz = Ke[:]/dz
+            T[0] = Ts
+        for i in range(1,N):
+            T[i] = T[i-1] - J[i]/Kedz[i]
+    if init_opt == 3:
+        experim = testP[0]
+        T0 = testP[1]
+        dT = testP[2]
+        period = testP[3]
+    if experim == 'e1':
+        T = T0 + zn * (qb/K[:])
+    elif experim == 'e2':
+        S0 = sourceP[0]
+        h = sourceP[1]
+        T = T0 + (S0/K[:]) * (h**2) * (1 - (np.exp(np.negative(zn[:])/h)))
+    elif experim == 'e3':
+        Tf = np.zeros(N+1)
+        Tf[0] = T0
+        for k in range(0,N):
+            Tf[k+1] = Tf[k] + Dz[k] * qb/K[k]
+        T[0] = Tf[0]
+        for k in range(1,N):
+            T[k] = 0.5*(Tf[k] + Tf[k+1])
+    elif experim == 'e4':
+        K0 = 2
+        dKdT = -0.0140
+        T[0] = T0
+        for k in range(1,N):
+            C = -(2*K0*T[k-1] + (dKdT*T[k-1]**2) + 2*qb*dz[k])
+            T[k] = (-K0 + math.sqrt(K0**2 - dKdT*C))/dKdT
+    elif experim == 'e5':
+        T = T0 + zn[:] * (qb/K[:])
+    elif experim == 'e6':
+        lambda_ = secyr*period
+        w = 2*math.pi/lambda_
+        k = np.sqrt(math.pi/(lambda_*diffu[:]))
+        T = T0 + dT * np.cos(k[:]*zn[:] - w*t + math.pi/2) * (np.exp(np.negative(k)*zn[:]))
+    elif experim == 'e7':
+        T = T0 + zn[:] * (qb/K[:])
+    else:
+        print ('')
+        print ('init_T: sorry no analytic soln available when itest = 0')
     return T
+ #------------------------------example
 import numpy as np
 from math import exp
 import math
@@ -10,7 +78,7 @@ secyr = 86400*365
 spaceP = [1,range(0,N),np.zeros(N)+0.2,np.zeros(N)+0.3]
 TpropP = [np.zeros(N)+0.1,2.4,1e6,np.zeros(N)+0.5]
 sourceP = np.zeros(N)+4
-testP = ['e9',0,0.1,2]  
+testP = ['e8',0,0.1,2]  
 QS = np.zeros(N)+3
 bcP = np.zeros(N)+5
 z = spaceP[1]
@@ -25,77 +93,5 @@ diffu = K/(rho*cp)
 Ts = bcP[0]
 Jb = bcP[1]
 qb = -Jb
-
-#Example of init_T
-
-#import numpy as np
-#N = 4
-#init_opt = 3
-#if init_opt == 1:
-    #print ('')
-#a1 = []
-#a2 = []
-#Tzname = ('Type name of initial temperature profile: ','s')
-#fid = open('Tzname.txt','r')
-#header1 = fid.readline()
-#header2 = fid.readline()
-#header3 = fid.readline()
-#par = fid.readline()
-#k = par.find (' ')
-#s1 = (par[0:k].strip())
-#s2 = (par[k:len(par)].strip())
-#wk=[float(s1),float(s2)]
-#count = len(wk)
-#fid.close()
-#wk = np.conjugate(wk)
-#zA = wk[:1]
-#TzA = wk[1:]
-#if init_opt == 2:
-    #J = np.zeros(N+1)
-    #J[4] = -qb
-    #for i in range(N-1,-1,-1):
-        #J[i] = J[i+1] - QS[i]
-    #Kedz = Ke[:]/dz
-    #T[0] = Ts
-    #for i in range(1,N):
-        #T[i] = T[i-1] - J[i]/Kedz[i]
-#if init_opt == 3:
-    #experim = testP[0]
-    #T0 = testP[1]
-    #dT = testP[2]
-    #period = testP[3]
-    #if experim == 'e1':
-        #T = T0 + zn * (qb/K[:])
-    #elif experim == 'e2':
-        #S0 = sourceP[0]
-        #h = sourceP[1]
-        #T = T0 + (S0/K[:]) * (h**2) * (1 - (np.exp(np.negative(zn[:])/h)))
-    #elif experim == 'e3':
-        #Tf = np.zeros(N+1)
-        #Tf[0] = T0
-        #for k in range(0,N):
-            #Tf[k+1] = Tf[k] + Dz[k] * qb/K[k]
-        #T[0] = Tf[0]
-        #for k in range(1,N):
-            #T[k] = 0.5*(Tf[k] + Tf[k+1])
-    #elif experim == 'e4':
-        #K0 = 2
-        #dKdT = -0.0140
-        #T[0] = T0
-        #for k in range(1,N):
-            #C = -(2*K0*T[k-1] + (dKdT*T[k-1]**2) + 2*qb*dz[k])
-            #T[k] = (-K0 + math.sqrt(K0**2 - dKdT*C))/dKdT
-    #elif experim == 'e5':
-        #T = T0 + zn[:] * (qb/K[:])
-    #elif experim == 'e6':
-        #lambda_ = secyr*period
-        #w = 2*math.pi/lambda_
-        #k = np.sqrt(math.pi/(lambda_*diffu[:]))
-        #T = T0 + dT * np.cos(k[:]*zn[:] - w*t + math.pi/2) * (np.exp(np.negative(k)*zn[:]))
-    #elif experim == 'e7':
-        #T = T0 + zn[:] * (qb/K[:])
-    #else:
-        #print ('')
-        #print ('init_T: sorry no analytic soln available when itest = 0')
-
-#init_T(N,t,spaceP,TpropP,QS,sourceP,bcP,testP,init_opt)
+init_opt = 3
+init_T(N,t,spaceP,TpropP,QS,sourceP,bcP,testP,init_opt)
