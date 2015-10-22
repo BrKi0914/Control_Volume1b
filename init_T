@@ -67,7 +67,7 @@ def init_T(N,t,spaceP,TpropP,QS,sourceP,bcP,testP,init_opt):
         print ('')
         print ('init_T: sorry no analytic soln available when itest = 0')
     return T
- #------------------------------example
+ #----------------------------example
 import numpy as np
 from math import exp
 import math
