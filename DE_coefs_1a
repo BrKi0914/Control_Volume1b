@@ -15,11 +15,14 @@ def DE_coefs_1a(dtf,dt1mf,Dzrho,Kedz,cpave,QS,Jb,Jbn):
     aP[k] = Dzrho[k] + dtf * Kedz[k]/cpave[k]
     aPp[k] = Dzrho[k] - dt1mf * Kedz[k]/cpave[k]
     b[k] = QS[k] - dtf*Jb - dt1mf*Jbn
+    
     return aU,aP,aD,aUp,aPp,aDp,b
 
 #-----------------------------example
 
+#import libraries
 import numpy as np
+
 N = 4
 aU = np.zeros(N)
 aP = np.zeros(N)
@@ -52,4 +55,5 @@ aDp[k] = 0
 aP[k] = Dzrho[k] + dtf * Kedz[k]/cpave[k]
 aPp[k] = Dzrho[k] - dt1mf * Kedz[k]/cpave[k]
 b[k] = QS[k] - dtf*Jb - dt1mf*Jbn
+
 DE_coefs_1a(dtf,dt1mf,Dzrho,Kedz,cpave,QS,Jb,Jbn)
