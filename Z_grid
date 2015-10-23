@@ -1,25 +1,73 @@
-def Z_grid(zfuL, zfdL, typL, nL, pos):
+def Z_grid(zfuL, zfdL, typL, nL, pos):   
+    n = 4 
+    nlayers = len(typL) 
+    nL = np.ones(n) + 1.5  
+    if nL[0]%1 != 0.5: 
+        print(' ') 
+        print('Error: Z_grid.m') 
+        print('Upper physical layer needs to include a 1/2-CV.  Thus, nL(1) ') 
+        print('should be a number like 1.5, 2.5, 4.5, etc.') 
+    j = 1 
+    Dz = (zfdL[0] - zfuL[0]) / nL[0] 
+    zf = [zfuL[0], zfuL[0] + 0.5*Dz] 
+    zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz) 
+    zf = zf = np.concatenate((zf, zfx))  
+    n = len(zf) - 1 
+    for i in range(1,n): 
+        typ[i] = typL[0] 
+    nn = n 
+    for j in range(1, nlayers): 
+        Dz = (zfdL[j] - zfuL[j]) / nL[j] 
+        zfx = np.arange(zfuL[j] + Dz, zfdL[j], Dz) 
+        zf = np.concatenate((zf,zfx)) 
+        n = len(zf) - 1 
+        for i in (nn, n-1): 
+            typ[i] = typL[j] 
+        nn = n 
+    N = len(zf) - 1 
+    typ[0] = typ[1] 
+    del Dz 
+    zfu = np.zeros(N) 
+    zfd = np.zeros(N) 
+    for i in range(0,N): 
+        zfu[i] = zf[i] 
+        zfd[i] = zf[i+1] 
+    z = np.zeros(N+1) 
+    for i in range(1,N): 
+        z[i] = 0.5*(zfu[i] + zfd[i]) 
+    z[0] = zf[0] 
+    z[N] = zf[N] 
+    Dz = np.zeros(N) 
+    for i in range(0,N): 
+        Dz[i] = zfd[i] - zfu[i] 
+    dz = np.zeros(N) 
+    for i in range(1,N): 
+        dz[i] = z[i] - z[i-1] 
+    dz[0] = 10E-10 
+    varep = np.zeros(N) 
+    for i in range(1,N): 
+        varep[i] = (z[i] - zf[i])/ dz[i]
     return zf,z,Dz,dz,varep,typ,N
+#--------------------------------example
 import numpy as np
 n = 4
-pos = 1
-nlayers = len(typL)
-nL = np.ones(n) + 1.5 
-if nL[0]%1 != 0.5:
-    print(' ')
-    print('Error: Z_grid.m')
-    print('Upper physical layer needs to include a 1/2-CV.  Thus, nL(1) ')
-    print('should be a number like 1.5, 2.5, 4.5, etc.')
 j = 1
+pos = 1
+nL = np.ones(n) + 1.5
+typL = np.ones(n) + 2
+nlayers = len(typL)
+zfdL = np.ones(n) + 1
+zfuL = np.ones(n)
 Dz = (zfdL[0] - zfuL[0]) / nL[0]
 zf = [zfuL[0], zfuL[0] + 0.5*Dz]
 zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz)
-zf = zf = np.concatenate((zf, zfx)) 
+zf = np.concatenate((zf, zfx))
 n = len(zf) - 1
+typ = np.zeros(10)
 for i in range(1,n):
     typ[i] = typL[0]
 nn = n
-for j in range(1, nlayers):
+for j in range(1,nlayers):
     Dz = (zfdL[j] - zfuL[j]) / nL[j]
     zfx = np.arange(zfuL[j] + Dz, zfdL[j], Dz)
     zf = np.concatenate((zf,zfx))
@@ -50,72 +98,23 @@ dz[0] = 10E-10
 varep = np.zeros(N)
 for i in range(1,N):
     varep[i] = (z[i] - zf[i])/ dz[i]
-
-# example of Z_grid
-#j = 1
-#n = 4
-#nL = np.ones(n) + 1.5
-#typL = np.ones(n) + 2
-#nlayers = len(typL)
-#zfdL = np.ones(n) + 1
-#zfuL = np.ones(n)
-#Dz = (zfdL[0] - zfuL[0]) / nL[0]
-#zf = [zfuL[0], zfuL[0] + 0.5*Dz]
-#zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz)
-#zf = np.concatenate((zf, zfx))
-#n = len(zf) - 1
-#typ = np.zeros(10) 
-#for i in range(1,n):
-    #typ[i] = typL[0]
-#nn = n
-#for j in range(1,nlayers):
-    #Dz = (zfdL[j] - zfuL[j]) / nL[j]
-    #zfx = np.arange(zfuL[j] + Dz, zfdL[j], Dz)
-    #zf = np.concatenate((zf,zfx))
-    #n = len(zf) - 1
-    #for i in (nn, n-1):
-        #typ[i] = typL[j]
-    #nn = n
-#N = len(zf) - 1
-#typ[0] = typ[1]
-#del Dz
-#zfu = np.zeros(N)
-#zfd = np.zeros(N)
-#for i in range(0,N):
-    #zfu[i] = zf[i]
-    #zfd[i] = zf[i+1]
-#z = np.zeros(N+1)
-#for i in range(1,N):
-    #z[i] = 0.5*(zfu[i] + zfd[i])
-#z[0] = zf[0]
-#z[N] = zf[N]
-#Dz = np.zeros(N)
-#for i in range(0,N):
-    #Dz[i] = zfd[i] - zfu[i]
-#dz = np.zeros(N)
-#for i in range(1,N):
-    #dz[i] = z[i] - z[i-1]
-#dz[0] = 10E-10
-#varep = np.zeros(N)
-#for i in range(1,N):
-    #varep[i] = (z[i] - zf[i])/ dz[i]
-#import matplotlib.pyplot as plt
-#junkx = float('NaN') *np.ones(zfuL.shape)
-#plt.plot(junkx,zfuL)
-#plt.plot(junkx,zfdL)
-#v = plt.axis([0,1,0,2])
-#plt.gca().invert_yaxis()
-#junk2 = 0.5*(v[1] - v[0] * np.ones(z.shape))
-#plt.ylabel('Depth (m)')
-#plt.title('Physical Layers (blue), CV interfaces (red), CV grid pts (black)')
-#for j in range(0,nlayers):
-    #plt.axhline(zfuL[j],0,1)
-#plt.axhline(zfdL[j],0,1)
-#for i in range(0,N+1):
-    #plt.axhline(zf[i],0,1,color='r')
-#for i in range(0,N+1):
-    #plt.plot(junk2,z,'o',markerfacecolor = 'k')
-#plt.axis([0,1,0.9,2.1])
-#plt.gca().invert_yaxis()
-#plt.show()
-#Z_grid(zfuL, zfdL, typL, nL, pos)
+import matplotlib.pyplot as plt
+junkx = float('NaN') *np.ones(zfuL.shape)
+plt.plot(junkx,zfuL)
+plt.plot(junkx,zfdL)
+v = plt.axis([0,1,0,2])
+plt.gca().invert_yaxis()
+junk2 = 0.5*(v[1] - v[0] * np.ones(z.shape))
+plt.ylabel('Depth (m)')
+plt.title('Physical Layers (blue), CV interfaces (red), CV grid pts (black)')
+for j in range(0,nlayers):
+    plt.axhline(zfuL[j],0,1)
+plt.axhline(zfdL[j],0,1)
+for i in range(0,N+1):
+    plt.axhline(zf[i],0,1,color='r')
+for i in range(0,N+1):
+    plt.plot(junk2,z,'o',markerfacecolor = 'k')
+plt.axis([0,1,0.9,2.1])
+plt.gca().invert_yaxis()
+plt.show()
+Z_grid(zfuL, zfdL, typL, nL, pos)
