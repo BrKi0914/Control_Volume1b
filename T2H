@@ -1,13 +1,12 @@
-def H(T, Cpave):
+def T2H(T, Cpave):
     Tref = 0
-    return Cpave * (T - Tref)
+    H = Cpave * (T - Tref)
 # Converts temperature to enthalpy.
 # The specific heat is allowed to be temperature dependent
 # The reference temperature is assumed to be O C.
-
-#Example of T2H
-#import numpy as np
-#T = np.array([60, 25, 100])
-#Cpave = ([0.5, 1, 0.5])
-#H = H(T, Cpave)
-#print H
+    return H
+#--------------------example
+import numpy as np
+T = 25.0
+Cpave = np.array([0.5, 0.8,0.9,1.0])
+T2H(T,Cpave)
