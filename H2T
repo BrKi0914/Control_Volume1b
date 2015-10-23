@@ -14,7 +14,9 @@ def H2T(H, Cpave):
 
 # the dummy arrays are created to test the T fuction
 
+# import libraries
 import numpy as np
+
 H = 55.0
 Cpave = np.array([0.5,1,0.75,0.8])
 H2T(H,Cpave)
