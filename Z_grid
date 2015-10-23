@@ -48,7 +48,9 @@ def Z_grid(zfuL, zfdL, typL, nL, pos):
     for i in range(1,N): 
         varep[i] = (z[i] - zf[i])/ dz[i]
     return zf,z,Dz,dz,varep,typ,N
+
 #--------------------------------example
+
 import numpy as np
 n = 4
 j = 1
