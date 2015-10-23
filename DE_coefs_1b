@@ -16,7 +16,9 @@ def DE_coefs_1b(dtf,dt1mf,DzC,Kedz,QS,qb,qbn):
     aPp[k] = DzC[k] - dt1mf * Kedz[k]
     b[k] = QS[k] - dtf*qb - dt1mf*qbn
     return aU,aP,aD,aUp,aPp,aDp,b
+
 #------------------------------example
+
 import numpy as np
 N = 4
 dtf = 3
