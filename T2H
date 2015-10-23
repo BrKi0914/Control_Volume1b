@@ -5,7 +5,7 @@ def T2H(T, Cpave):
 # The specific heat is allowed to be temperature dependent
 # The reference temperature is assumed to be O C.
     return H
-#--------------------example
+#--------------------------------------------------example
 import numpy as np
 T = 25.0
 Cpave = np.array([0.5, 0.8,0.9,1.0])
