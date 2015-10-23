@@ -5,9 +5,9 @@ def H2T(H, Cpave):
 # The specific heat can be temperature dependent.
 # The reference temperature is assumed to be 0 C.
     return T
-#----------------------example
+#--------------------------------------------example
 # the dummy arrays are created to test the T fuction
 import numpy as np
-H = np.array([55,30,70,45])
-Cpave = np.array([5,6,10,9])
+H = 55.0
+Cpave = np.array([0.5,1,0.75,0.8])
 H2T(H,Cpave)
