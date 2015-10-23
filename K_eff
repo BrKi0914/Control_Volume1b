@@ -1,125 +1,26 @@
-def K_eff (m,K,varep):
+ def K_eff (m,K,varep):
+
 # Find the effective conductivity at the interfaces.
+
 # K       conductivity at the grid pts
 # varep   fractional distance
+    
     Ke = np.zeros(m)
+    
     for k in range(1,m):  
-        #Ke[k-1] = 1/(1-float(varep[k])/float(K[k-1]) + float(varep[k])/float(K[k]))
+        
+        # Ke[k-1] = 1/(1-float(varep[k])/float(K[k-1]) + float(varep[k])/float(K[k]))
+        # Another formula that may improve the Ke[k-1] 
+        
         Ke[k-1] = 1/(1-varep[k]/K[k-1] + varep[k]/K[k])
     return Ke
     
-# example of K_eff function
-#import numpy as np
-#n=4;
-#a = np.ones(n)
-#b = np.zeros(n)+ 2
-#K_eff (n,a,b)
+#----------------------------------------------------------------------------example
 
-
-# Current version of Z_grid(Not done yet)
-#def Z_grid (zfuL, zfdL, typL, nL, pos):
+# import libraries
 import numpy as np
-n = 4
-nlayers = len(typL)
-nL = np.ones(n) + 1.5 
-if nL[0]%1 != 0.5:
-    print(' ')
-    print('Error: Z_grid.m')
-    print('Upper physical layer needs to include a 1/2-CV.  Thus, nL(1) ')
-    print('should be a number like 1.5, 2.5, 4.5, etc.')
-j = 1
-Dz = (zfdL[0] - zfuL[0]) / nL[0]
-zf = [zfuL[0], zfuL[0] + 0.5*Dz]
-zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz)
-zf = zf = np.concatenate((zf, zfx)) 
-n = len(zf) - 1
-for i in range(1,n):
-    typ[i] = typL[0]
-nn = n
-for j in range(1, nlayers):
-    Dz = (zfdL[j] - zfuL[j]) / nL[j]
-    zfx = np.arange(zfuL[j] + Dz, zfdL[j], Dz)
-    zf = np.concatenate((zf,zfx))
-    n = len(zf) - 1
-    for i in (nn, n-1):
-        typ[i] = typL[j]
-    nn = n
-N = len(zf) - 1
-typ[0] = typ[1]
-del Dz
-zfu = np.zeros(N)
-zfd = np.zeros(N)
-for i in range(0,N):
-    zfu[i] = zf[i]
-    zfd[i] = zf[i+1]
-z = np.zeros(N+1)
-for i in range(1,N):
-    z[i] = 0.5*(zfu[i] + zfd[i])
-z[0] = zf[0]
-z[N] = zf[N]
-Dz = np.zeros(N)
-for i in range(0,N):
-    Dz[i] = zfd[i] - zfu[i]
-dz = np.zeros(N)
-for i in range(1,N):
-    dz[i] = z[i] - z[i-1]
-dz[0] = 10E-10
-varep = np.zeros(N)
-for i in range(1,N):
-    varep[i] = (z[i] - zf[i])/ dz[i]
-    
-    
-    
-    
-# Example of Z_grid
-#j = 1
-#n = 4
-#nL = np.ones(n) + 1.5
-#typL = np.ones(n) + 2
-#nlayers = len(typL)
-#zfdL = np.ones(n) + 1
-#zfuL = np.ones(n)
-#typ = np.zeros(9)
-#Dz = (zfdL[0] - zfuL[0]) / nL[0]
-#zf = [zfuL[0], zfuL[0] + 0.5*Dz]
-#zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz)
-#zf = np.concatenate((zf, zfx))
-#n = len(zf) - 1 
-#for i in range(1,n):
-    #typ[i] = typL[0]
-#nn = n
-#for j in range(1,nlayers):
-    #Dz = (zfdL[j] - zfuL[j]) / nL[j]
-    #zfx = np.arange(zfuL[j] + Dz, zfdL[j], Dz)
-    #zf = np.concatenate((zf,zfx))
-    #n = len(zf) - 1
-    #for i in (nn, n-1):
-        #typ[i] = typL[j]
-    #nn = n
-#N = len(zf) - 1
-#typ[0] = typ[1]
-#del Dz
-#zfu = np.zeros(N)
-#zfd = np.zeros(N)
-#for i in range(0,N):
-    #zfu[i] = zf[i]
-    #zfd[i] = zf[i+1]
-#z = np.zeros(N+1)
-#for i in range(1,N):
-    #z[i] = 0.5*(zfu[i] + zfd[i])
-#z[0] = zf[0]
-#z[N] = zf[N]
-#Dz = np.zeros(N)
-#for i in range(0,N):
-    #Dz[i] = zfd[i] - zfu[i]
-#dz = np.zeros(N)
-#for i in range(1,N):
-    #dz[i] = z[i] - z[i-1]
-#dz[0] = 10E-10
-#varep = np.zeros(N)
-#for i in range(1,N):
-    #varep[i] = (z[i] - zf[i])/ dz[i]
 
-
-
-    
+n=4;
+a = np.ones(n)
+b = np.zeros(n)+ 2
+K_eff (n,a,b)
