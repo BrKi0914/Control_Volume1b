@@ -37,6 +37,7 @@ def TDMA (aU, aP, aD, aUp, aPp, aDp, b, Hn, Hs):
     
     for k in range(1,N):
         H[k] = P[k] * H[k-1] + Q[k]
+    
     return H
     
 #---------------------------------------example
@@ -54,4 +55,5 @@ b = np.ones(n)+6
 aP = np.ones(n)
 aD = np.ones(n)+1
 aU = np.ones(n)+2
+
 TDMA(aU, aP, aD, aUp, aPp, aDp, b, Hn, Hs)
