@@ -39,16 +39,19 @@ def TDMA (aU, aP, aD, aUp, aPp, aDp, b, Hn, Hs):
         H[k] = P[k] * H[k-1] + Q[k]
     return H
     
-# Example of TDMA
-# import numpy as np
-# n=4;
-# Hs = 1
-# Hn = np.ones(n)+7
-# aUp = np.ones(n)+3
-# aPp = np.ones(n)+4
-# aDp = np.ones(n)+5
-# b = np.ones(n)+6
-# aP = np.ones(n)
-# aD = np.ones(n)+1
-# aU = np.ones(n)+2
-# TDMA(aU, aP, aD, aUp, aPp, aDp, b, Hn, Hs)
+#---------------------------------------example
+
+# import libraries
+import numpy as np
+
+n=4;
+Hs = 1
+Hn = np.ones(n)+7
+aUp = np.ones(n)+3
+aPp = np.ones(n)+4
+aDp = np.ones(n)+5
+b = np.ones(n)+6
+aP = np.ones(n)
+aD = np.ones(n)+1
+aU = np.ones(n)+2
+TDMA(aU, aP, aD, aUp, aPp, aDp, b, Hn, Hs)
