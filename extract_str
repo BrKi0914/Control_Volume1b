@@ -4,9 +4,11 @@ def extract_str (s):
     
     k = str1.find ('%')
     s2 = (str1[0:k])
+    
     return s2.strip()
     
-# example of extract_str
-# str1 = "e3_layer    % Lname"
-# 'e3_layer    '.strip()
-# extract_str(str1)
+#---------------------------------------------example
+
+str1 = "e3_layer    % Lname"
+'e3_layer    '.strip()
+extract_str(str1)
