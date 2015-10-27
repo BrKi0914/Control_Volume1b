@@ -1,5 +1,16 @@
 def DE_coefs_1a(dtf,dt1mf,Dzrho,Kedz,cpave,QS,Jb,Jbn):
     
+# Find DE coefs for CV code cv1a.m
+
+# - diffusion:              yes
+# - advection:              no
+# - composite materials:    yes
+# - melting:                no
+# - source term:            yes
+
+# Note: for unconditional stability, aPp should be greater than 0.  This can
+# fail if time step dt is too large.
+    
     for k in range(1,N-1):
         aU[k] = dtf * Kedz[k] / cpave[k-1]
         aUp[k] = dt1mf * Kedz[k] / cpave[k-1]
@@ -9,7 +20,7 @@ def DE_coefs_1a(dtf,dt1mf,Dzrho,Kedz,cpave,QS,Jb,Jbn):
         aPp[k] = Dzrho[k] - dt1mf * (Kedz[k]/cpave[k] + Kedz[k+1]/cpave[k])
         b[k] = QS[k]
     
-# lowest CV    
+# lowest CV   
     
     k = N-1
     aU[k] = dtf * Kedz[k] / cpave[k-1]
@@ -21,13 +32,21 @@ def DE_coefs_1a(dtf,dt1mf,Dzrho,Kedz,cpave,QS,Jb,Jbn):
     b[k] = QS[k] - dtf*Jb - dt1mf*Jbn
     
     return aU,aP,aD,aUp,aPp,aDp,b
+    
+#-------------------------example
 
-#-----------------------------example
-
-#import libraries
+# import libraries
 import numpy as np
 
 N = 4
+dtf = 1
+dt1mf = 3
+Dzrho = np.zeros(N) + 4
+Kedz = np.zeros(N) + 3
+cpave = np.zeros(N) + 5
+QS = np.zeros(N) + 6
+Jb = 7
+Jbn = 8
 
 aU = np.zeros(N)
 aP = np.zeros(N)
@@ -37,6 +56,6 @@ aPp = np.zeros(N)
 aDp = np.zeros(N)
 b = np.zeros(N)
 
-# upper boundary and interior points
+# upper boundary & interior points
 
 DE_coefs_1a(dtf,dt1mf,Dzrho,Kedz,cpave,QS,Jb,Jbn)
