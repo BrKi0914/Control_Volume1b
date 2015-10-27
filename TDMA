@@ -40,7 +40,7 @@ def TDMA (aU, aP, aD, aUp, aPp, aDp, b, Hn, Hs):
     
     return H
     
-#---------------------------------------example
+#---------------------------example
 
 # import libraries
 import numpy as np
