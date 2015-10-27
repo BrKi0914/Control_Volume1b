@@ -5,6 +5,7 @@ def extract_num (s):
     
     k=str1.find("%")
     x=float(str1[0:k])
+    
     return x
 
 #----------------------------------------------example
