@@ -1,0 +1,36 @@
+print('')
+print('Regions =')
+print('')
+print(regions)
+ireg = input('Type region#: ')
+region = regions[ireg]
+
+if region == 'test':
+    projects = ['easy','rock','ice']  #  MATLAB uses cell arrays for regions,projects, and expers.
+#  How do I make the code run the same way as the MATLAB code does?   
+                                                                                  
+    
+    if project == 'easy':
+        expers = ['e1','e2','e3','e4','e5','e6','e7']
+
+if region == 'alaska':
+    projects = ['active-layer','deep-permafrost']
+    
+    if project == 'active-layer' or 'deep-permafrost':
+        expers = ['dp1','dp2','dp3','dp4']
+
+if region == 'antarc':
+    projects = ['TD','DVDP','SDM','WAIS-D']
+
+if region == 'greenland':
+    projects = ['GISP','GRIP','NGRIP']
+
+print('')
+print('Projects =')
+print('')
+print(projects)
+iproj = input('Type project#: ')
+project = projects[iproj]
+
+print('')
+print('Experiment
