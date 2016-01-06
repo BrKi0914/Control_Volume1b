@@ -6,9 +6,9 @@ def source_1p(z,sourceP):
 #  Source term at each grid point
     
     return S
-    
-example
-----------------------------
+
+-------------------------example
+
 import numpy as np
 z = 1.0
 sourceP = np.array([0.5])
