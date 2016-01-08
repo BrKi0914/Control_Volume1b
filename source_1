@@ -1,0 +1,14 @@
+def source_1(spaceP,t):
+    
+    sourceP = [SO]
+    QS = np.zeros(N)
+    Sfac = np.ones(N)
+    
+    return QS,Sfac,sourceP
+    
+--------------------example
+
+import numpy as np
+N = 4
+S0 = 0
+source_1(spaceP,t)
