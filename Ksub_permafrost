@@ -19,7 +19,7 @@ def Ksub_permafrost(T,phi,phi_i,phi_u,Kg25):
             sum1 = sum1 + c[i] * Tr[j]**d[i]
         Ku[j] = sum1
         print Ku[j]
-    return K
+    return Ku
     
 ------------------------------------------example
 
