@@ -1,55 +1,108 @@
 def Z_grid(zfuL, zfdL, typL, nL, pos):   
+
+# Routine setups up the Control Volume Space Grid (Z-direction).
+
+# The location and type of physical layers are input.  The space grid uses
+# the boundaries between the physical layers for CV interfaces.  In addition,
+# each physical layer can be broken into multiple control volumes (eg. 25 CVs)
+#may be used to represent a 50-m thick sandstone layer).
+
+# Physical Layers:
+
+# Control Volume Space Grid:
+
+# N = number of control volumes
+# zf = CV interfaces                       (N+1)
+# z = CV grid points                       (N+1) with one embedded in lowest interface
+# Dz = width of CVs                        (N)
+# dz = distance between grid points        (N)
+# varep = fractional distance              (N)
+# typ = material type @ each grid point    (N)
+
+# Note: The upper physical layer contains a 1/2 CV, thus nL(1) must be a number
+# like 1.5, 2.5, 4.5, etc.
+
+# ----------------------------------------------------------------------------     
+    
     n = 4 
-    nlayers = len(typL) 
+    nlayers = len(typL)
+# Test nL(1), see note above.
+
     nL = np.ones(n) + 1.5  
+    
     if nL[0]%1 != 0.5: 
         print(' ') 
         print('Error: Z_grid.m') 
         print('Upper physical layer needs to include a 1/2-CV.  Thus, nL(1) ') 
         print('should be a number like 1.5, 2.5, 4.5, etc.') 
+        #pause
+
+# Define CV interface locations.
+# Also define material type at each grid point.
+    
     j = 1 
-    Dz = (zfdL[0] - zfuL[0]) / nL[0] 
-    zf = [zfuL[0], zfuL[0] + 0.5*Dz] 
-    zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz) 
-    zf = zf = np.concatenate((zf, zfx))  
-    n = len(zf) - 1 
+    Dz = (zfdL[0] - zfuL[0]) / nL[0]                # CV width for 1st physical layer 
+    zf = [zfuL[0], zfuL[0] + 0.5*Dz]                # first CV 
+    zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz)     # remaining CVs in this phy. layer 
+    zf = zf = np.concatenate((zf, zfx))           
+    n = len(zf) - 1                                 # number of CVs so far                                                     
     for i in range(1,n): 
         typ[i] = typL[0] 
     nn = n 
     for j in range(1, nlayers): 
-        Dz = (zfdL[j] - zfuL[j]) / nL[j] 
+        Dz = (zfdL[j] - zfuL[j]) / nL[j]            # CV width for remaining layers 
         zfx = np.arange(zfuL[j] + Dz, zfdL[j], Dz) 
         zf = np.concatenate((zf,zfx)) 
-        n = len(zf) - 1 
+        n = len(zf) - 1                            
         for i in (nn, n-1): 
             typ[i] = typL[j] 
         nn = n 
-    N = len(zf) - 1 
-    typ[0] = typ[1] 
-    del Dz 
+    N = len(zf) - 1                                 # total number of CVs                                                         
+    typ[0] = typ[1]                                 # material type @ upper bnd 
+    del Dz
+
+# Define u & d interfaces for each of the N control volumes.  
+    
     zfu = np.zeros(N) 
     zfd = np.zeros(N) 
     for i in range(0,N): 
         zfu[i] = zf[i] 
-        zfd[i] = zf[i+1] 
+        zfd[i] = zf[i+1]
+        
+# Define grid point location at the center of each CV.
+# Also embed a grid point within the upper & lower boundaries.
+        
+        
     z = np.zeros(N+1) 
     for i in range(1,N): 
         z[i] = 0.5*(zfu[i] + zfd[i]) 
     z[0] = zf[0] 
-    z[N] = zf[N] 
+    z[N] = zf[N]
+    
+# Define width of control volumes.    
+    
     Dz = np.zeros(N) 
     for i in range(0,N): 
-        Dz[i] = zfd[i] - zfu[i] 
+        Dz[i] = zfd[i] - zfu[i]
+        
+# Define distance between grid points.        
+        
     dz = np.zeros(N) 
     for i in range(1,N): 
         dz[i] = z[i] - z[i-1] 
-    dz[0] = 10E-10 
+    dz[0] = 10E-10
+    
+# Fractional distance of interface i to grid pt (i-1), from grid pt i.    
+    
     varep = np.zeros(N) 
     for i in range(1,N): 
         varep[i] = (z[i] - zf[i])/ dz[i]
-    return zf,z,Dz,dz,varep,typ,N
 
-#--------------------------------example
+# > Display setup                
+    
+    return zf,z,Dz,dz,varep,typ,N
+    
+-------------------------------------------------------------example
 
 import numpy as np
 n = 4
@@ -101,6 +154,8 @@ varep = np.zeros(N)
 for i in range(1,N):
     varep[i] = (z[i] - zf[i])/ dz[i]
 import matplotlib.pyplot as plt
+
+# figure('position',pos)
 junkx = float('NaN') *np.ones(zfuL.shape)
 plt.plot(junkx,zfuL)
 plt.plot(junkx,zfdL)
@@ -109,11 +164,14 @@ plt.gca().invert_yaxis()
 junk2 = 0.5*(v[1] - v[0] * np.ones(z.shape))
 plt.ylabel('Depth (m)')
 plt.title('Physical Layers (blue), CV interfaces (red), CV grid pts (black)')
+# show physical layers
 for j in range(0,nlayers):
     plt.axhline(zfuL[j],0,1)
 plt.axhline(zfdL[j],0,1)
+# show CV interfaces
 for i in range(0,N+1):
     plt.axhline(zf[i],0,1,color='r')
+# show CV grid pts
 for i in range(0,N+1):
     plt.plot(junk2,z,'o',markerfacecolor = 'k')
 plt.axis([0,1,0.9,2.1])
