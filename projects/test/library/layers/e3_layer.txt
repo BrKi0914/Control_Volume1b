@@ -1,0 +1,1 @@
+% e3 physical setup:%% composite material  0    1  1   1.5  1   50  2   49 50  100  1   25100  240  2   28240  500  1   26500 1000  2   25

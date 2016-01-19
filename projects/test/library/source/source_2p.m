@@ -1,0 +1,1 @@
+ function [S] = source_2p(z,sourceP)% Source term at each grid point. S0 = sourceP{1}; h  = sourceP{2}; S  = S0*exp(-z/h);

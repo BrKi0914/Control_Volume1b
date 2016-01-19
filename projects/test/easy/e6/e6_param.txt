@@ -1,0 +1,1 @@
+% e6 test parameters:-10    % T0 (C)1      % dT (K)1      % period (yrs)0      % qb (mW/m^2)

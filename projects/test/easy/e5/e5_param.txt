@@ -1,0 +1,1 @@
+% e5 test parameters:-10    % T0 (C)1      % dT (K)0      % period (yrs)50     % qb (mW/m^2)

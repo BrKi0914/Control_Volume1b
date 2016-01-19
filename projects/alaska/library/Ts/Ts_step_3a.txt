@@ -1,0 +1,2 @@
+% Ts version '3' (alaska)% Ts = 1 K instantaneous step increase at 3 alinear Age(a)    T(C)   0.0     -9   1.0     -9
+  2.99     -9  3.0      -10

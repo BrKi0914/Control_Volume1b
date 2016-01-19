@@ -1,0 +1,1 @@
+% dp2 physical setup:%% saturated permafrost, 1 layer  0    1  1   1.5  1   50  1   98 50  150  1   200150  300  1   300

@@ -1,0 +1,1 @@
+% Ts version '1' (test)% Ts = constantlinear Age(a)    T(C)   0.0     -10   5.0     -10  10.0     -10

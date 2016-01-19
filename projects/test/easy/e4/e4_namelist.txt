@@ -1,0 +1,6 @@
+e4 namelist
+
+e4_layer   % layers
+Ts_1       % upper bc
+Tprop_2    % thermophysical properties
+source_1   % source term

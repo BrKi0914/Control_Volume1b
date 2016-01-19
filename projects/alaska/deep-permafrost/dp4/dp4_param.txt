@@ -1,0 +1,7 @@
+dp4 material and lower-bc parameters:
+
+4      % imat (silty clay)
+1      % matfrac 
+2.00   % Kg25 (grain conductivity at 25 C)
+0.25   % near-surface porosity
+40     % qb (mW/m^2)

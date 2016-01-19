@@ -1,0 +1,1 @@
+% e6 physical setup:%% homogeneous material, lots of CVs  0  0.1  1   1.50.1   12  1   119 12   20  1    50 20  100  1    40

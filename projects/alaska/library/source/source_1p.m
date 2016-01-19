@@ -1,0 +1,1 @@
+ function [S] = source_1p(z,sourceP)% Source term at each grid point. S0 = sourceP{1}; S  = S0*z;

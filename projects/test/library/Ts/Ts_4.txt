@@ -1,0 +1,4 @@
+% Ts version '4' (test)% Ts = triangle heating pulse centered at 10 a, duration 1 yrlinear Age(a)    T(C)   0.0     -10   5.0     -10
+   9.5     -10
+  10.0      -9
+  10.5     -10  11.0     -10

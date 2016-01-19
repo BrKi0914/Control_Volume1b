@@ -1,0 +1,4 @@
+% Ts version '2' (alaska)% Ts = triangle heating pulse centered at 1 a, duration 0.1 yrlinear Age(a)    T(C)   0.0     -10   0.5     -10
+   0.9     -10   1.0      -9
+   1.1     -10
+   2.0     -10

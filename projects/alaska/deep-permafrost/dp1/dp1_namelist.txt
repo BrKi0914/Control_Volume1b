@@ -1,0 +1,6 @@
+dp1 namelist
+
+dp1_layer  % layers
+Ts_c       % upper bc
+Tprop_4    % thermophysical properties
+source_1   % source term

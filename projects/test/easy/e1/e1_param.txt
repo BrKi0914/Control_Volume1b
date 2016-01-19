@@ -1,0 +1,2 @@
+% e1 test parameters:-10    % T0 (C)0      % dT (K)0      % period (yrs)
+50     % qb (mW/m^2)

@@ -1,0 +1,6 @@
+dp2 namelist
+
+dp2_layer  % layers
+Ts_tri     % upper bc
+Tprop_4    % thermophysical properties
+source_1   % source term

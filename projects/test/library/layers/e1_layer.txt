@@ -1,0 +1,2 @@
+% e1 physical setup:% homogenous material, only a few CVs to make testing easy
+  0,  1,  1,  1.5  1,  5,  1,  4  5, 10,  1,  2 10, 20,  1,  2

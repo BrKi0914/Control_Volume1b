@@ -1,0 +1,6 @@
+e3 namelist
+
+e3_layer   % layers
+Ts_1       % upper bc
+Tprop_1    % thermophysical properties
+source_1   % source term
