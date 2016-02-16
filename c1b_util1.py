@@ -24,10 +24,14 @@
  	set_experim()
  	Ksub_permafrost(T,phi,phi_i,phi_u,Kg25) Not sure complete or not
  	rho_permafrost(phi,phi_i,phi_u)
+ 	testCV(N,t,spaceP,TpropP,sourceP,bcP,testP)
 """
 
 import numpy as np
 #import matplotlib.pyplot as plt
+from math import exp
+
+import math
 
 def feval(funcName, *args):  
     return eval(funcName)(*args)
@@ -115,7 +119,7 @@ def K_eff(m,K,varep):
      Ke = np.zeros(m)
     
      for k in range(1,m):        
-         Ke[k-1] = 1/((1-varep[k])/K[k-1] + varep[k]/K[k])
+         Ke[k] = 1/((1-varep[k])/K[k-1] + varep[k]/K[k])
     
      return Ke
      
@@ -306,7 +310,7 @@ def DE_coefs_1b(N,dtf,dt1mf,DzC,Kedz,QS,qb,qbn):
      for k in range(1,N-1):
          aU[k] = dtf * Kedz[k]
          aUp[k] = dt1mf * Kedz[k]
-         aD[k] = dtf * Kedz[k]
+         aD[k] = dtf * Kedz[k+1]
          aDp[k] = dt1mf * Kedz[k+1]
          aP[k] = DzC[k] + dtf * (Kedz[k] + Kedz[k+1])
          aPp[k] = DzC[k] - dt1mf * (Kedz[k] + Kedz[k+1])
@@ -414,7 +418,7 @@ def init_T(N,t,spaceP,TpropP,QS,sourceP,bcP,testP,init_opt):
 	-------
 	>>> from c1b_util1 import init_T
 	>>> N = 4; t = 5
-	>>> spaceP = [1,range(0,N),np.zeros(N) + 0.2,np.zeros(N) + 0.3]
+	>>> spaceP = [1,np.array([1,2,3,4]),np.zeros(N) + 0.2,np.zeros(N) + 0.3]
 	>>> sourceP = np.zeros(N)+4
 	>>> TpropP = [np.zeros(N)+0.1,2.4,1e6,np.zeros(N)+0.5]
 	>>> QS = np.zeros(N) + 3
@@ -430,7 +434,7 @@ def init_T(N,t,spaceP,TpropP,QS,sourceP,bcP,testP,init_opt):
 
 	z = spaceP[1]; Dz = spaceP[2]; dz = spaceP[3]; 
 	#NOTE: we cannot do zn = z[0:N], bc we end with N-1 element
-	zn = z # grid points without the one embedded in lowest interface
+	zn = z[0:N] # grid points without the one embedded in lowest interface
 
 	K = TpropP[0]; rho = TpropP[1]; cp = TpropP[2]; Ke = TpropP[3]
 	diffu = K/(rho*cp)
@@ -474,19 +478,20 @@ def init_T(N,t,spaceP,TpropP,QS,sourceP,bcP,testP,init_opt):
 
 		if experim == 'e1':
 			print T0, zn, qb,K
-			T = T0 + zn * qb / K 
+			T = T0 + zn * (qb/K)
+            
 
 		elif experim == 'e2':
-			#S0 = sourceP[0]; h = sourceP[1]
-			#T = T0 + (S0/K) * (h**2) * (1- np.exp(-zn/h))
-			print 'This part does not work, bc of sourceP = [0], has to have more than 1 element'
+			S0 = sourceP[0]; h = sourceP[1]
+			T = T0 + (S0/K) * (h**2) * 1 - np.exp(-zn/h)
+			#print 'This part does not work, bc of sourceP = [0], has to have more than 1 element'
 
 		elif experim == 'e3':
 			Tf = np.zeros(N+1)
 			Tf[0] = T0
 			for k in range(0,N):
 				Tf[k+1] = Tf[k] + Dz[k] * qb/K[k]
-			T[0] - Tf[0]
+			T[0] = Tf[0]
 			for k in range(1,N):
 				T[k] = 0.5*(Tf[k] + Tf[k+1])
 
@@ -495,17 +500,17 @@ def init_T(N,t,spaceP,TpropP,QS,sourceP,bcP,testP,init_opt):
 			dKdT = -0.0140
 			T[0] = T0
 			for k in range(1,N):
-				C = -(2*K0*T[k-1] + dKdT*T[k-1]**2 + 2*qb*dz[k])
+				C = -(2*K0*T[k-1] + (dKdT*T[k-1]**2) + 2*qb*dz[k])
 				T[k] = (-K0 + np.sqrt(K0**2 - dKdT*C))/dKdT
 
 		elif experim == 'e5':
-			T = T0 + zn * (qb/K)
+			T = T0 + zn[:] * qb / K
 
 		elif experim == 'e6':
 			lambda_ = secyr*period # period =0, getting div 0 on the next line
-			w = 2*np.pi/lambda_
+			w = 2*math.pi/lambda_
 			k = np.sqrt(np.pi/(lambda_*diffu))
-			T = T0 + dT * np.cos(k*zn - w*t + np.pi/2) * np.exp(-k*zn)
+			T = T0 + dT * np.cos(k*zn - w*t + np.pi/2) *  np.exp(-k*zn)
 
 		elif experim == 'e7':
 			T = T0 + zn * qb / K
@@ -516,110 +521,133 @@ def init_T(N,t,spaceP,TpropP,QS,sourceP,bcP,testP,init_opt):
 
 	return T  
 
-def Z_grid1(zfuL, zfdL, typL, nL, pos):   
+def Z_grid1(zfuL, zfdL, typL, nL, pos):
 
-# Routine setups up the Control Volume Space Grid (Z-direction).
+	"""Routine setups up the Control Volume Space Grid (Z-direction).
+	The location and type of physical layers are input.  The space grid uses
+	the boundaries between the physical layers for CV interfaces.  In addition,
+	each physical layer can be broken into multiple control volumes (eg. 25 CVs)
+	may be used to represent a 50-m thick sandstone layer).
 
-# The location and type of physical layers are input.  The space grid uses
-# the boundaries between the physical layers for CV interfaces.  In addition,
-# each physical layer can be broken into multiple control volumes (eg. 25 CVs)
-#may be used to represent a 50-m thick sandstone layer).
+	Physical Layers:
 
-# Physical Layers:
+	Control Volume Space Grid:
 
-# Control Volume Space Grid:
+	N = number of control volumes
+	zf = CV interfaces                       (N+1)
+	z = CV grid points                       (N+1) with one embedded in lowest interface
+	Dz = width of CVs                        (N)
+	dz = distance between grid points        (N)
+	varep = fractional distance              (N)
+	typ = material type @ each grid point    (N)
 
-# N = number of control volumes
-# zf = CV interfaces                       (N+1)
-# z = CV grid points                       (N+1) with one embedded in lowest interface
-# Dz = width of CVs                        (N)
-# dz = distance between grid points        (N)
-# varep = fractional distance              (N)
-# typ = material type @ each grid point    (N)
+	Note: The upper physical layer contains a 1/2 CV, thus nL(1) must be a number
+	like 1.5, 2.5, 4.5, etc.
 
-# Note: The upper physical layer contains a 1/2 CV, thus nL(1) must be a number
-# like 1.5, 2.5, 4.5, etc.
+	----------------------------------------------------------------------------     
 
-# ----------------------------------------------------------------------------     
+	Test nL(1), see note above.
+
+	Example 
+	-------
+	>>> pos = 1; nL = np.array([2.5,2.5,2.5,2.5]); typL = np.array([3,3,3,3])
+	>>> zfdL = np.array([2,2,2,2]); zfuL = np.array([1,1,1,1])
+	>>> [zf,z,Dz,dz,varep,typ,N]=Z_grid(zfuL, zfdL, typL, nL, pos) 
+
+	"""   
+	nlayers = len(typL)                             # number of physical layers
+
+	if nL[0]%1 != 0.5: 
+		print(' ') 
+		print('Error: Z_grid.m') 
+		print('Upper physical layer needs to include a 1/2-CV.  Thus, nL(1) ') 
+		print('should be a number like 1.5, 2.5, 4.5, etc.') 
+	# pause
+   
+	# Define CV interface locations.
+	# Also define material type at each grid point.
+	j = 1 
+	Dz = (zfdL[0] - zfuL[0]) / nL[0]                # CV width for 1st physical layer 
+	zf = [zfuL[0], zfuL[0] + 0.5*Dz]                # first CV
+	zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz)     # remaining CVs in this phy. layer 
+	zf = zf = np.concatenate((zf, zfx))           
+	n = len(zf) - 1                                 # number of CVs so far   
+
+	temp = np.zeros(n)
+
+	for i in range(1,n): 
+		temp[i] = typL[0]
+
+	nn = n
+
+	for j in range(1,nlayers): 
+		Dz = (zfdL[j] - zfuL[j]) / nL[j]
+		zfx = np.arange(zfuL[j] + Dz, zfdL[j]+1, Dz)
+		zf = np.concatenate((zf,zfx))
+		n = len(zf) - 1
     
-    n = 4 
-    nlayers = len(typL)
-# Test nL(1), see note above.
+		temp1 = np.zeros(n)
+		for i in range(nn-1,n):
+			temp1[i] = typL[j]
+			typ = temp1       
+	nn=n
+	N = len(zf) - 1
+	typ[0] = typ[1]
+	typ = typ.T
 
-    nL = np.ones(n) + 1.5  
-    
-    if nL[0]%1 != 0.5: 
-        print(' ') 
-        print('Error: Z_grid.m') 
-        print('Upper physical layer needs to include a 1/2-CV.  Thus, nL(1) ') 
-        print('should be a number like 1.5, 2.5, 4.5, etc.') 
-        #pause
+	del Dz
 
-# Define CV interface locations.
-# Also define material type at each grid point.
-    
-    j = 1 
-    Dz = (zfdL[0] - zfuL[0]) / nL[0]                # CV width for 1st physical layer 
-    zf = [zfuL[0], zfuL[0] + 0.5*Dz]                # first CV 
-    zfx = np.arange(zf[1] + Dz, zfdL[0]+Dz, Dz)     # remaining CVs in this phy. layer 
-    zf = zf = np.concatenate((zf, zfx))           
-    n = len(zf) - 1                                 # number of CVs so far                                                     
-    for i in range(1,n): 
-        typ[i] = typL[0] 
-    nn = n 
-    for j in range(1, nlayers): 
-        Dz = (zfdL[j] - zfuL[j]) / nL[j]            # CV width for remaining layers 
-        zfx = np.arange(zfuL[j] + Dz, zfdL[j], Dz) 
-        zf = np.concatenate((zf,zfx)) 
-        n = len(zf) - 1                            
-        for i in (nn, n-1): 
-            typ[i] = typL[j] 
-        nn = n 
-    N = len(zf) - 1                                 # total number of CVs                                                         
-    typ[0] = typ[1]                                 # material type @ upper bnd 
-    del Dz
+	zfu = np.zeros(N); zfd = np.zeros(N)
 
-# Define u & d interfaces for each of the N control volumes.  
-    
-    zfu = np.zeros(N) 
-    zfd = np.zeros(N) 
-    for i in range(0,N): 
-        zfu[i] = zf[i] 
-        zfd[i] = zf[i+1]
-        
-# Define grid point location at the center of each CV.
-# Also embed a grid point within the upper & lower boundaries.
-        
-        
-    z = np.zeros(N+1) 
-    for i in range(1,N): 
-        z[i] = 0.5*(zfu[i] + zfd[i]) 
-    z[0] = zf[0] 
-    z[N] = zf[N]
-    
-# Define width of control volumes.    
-    
-    Dz = np.zeros(N) 
-    for i in range(0,N): 
-        Dz[i] = zfd[i] - zfu[i]
-        
-# Define distance between grid points.        
-        
-    dz = np.zeros(N) 
-    for i in range(1,N): 
-        dz[i] = z[i] - z[i-1] 
-    dz[0] = 10E-10
-    
-# Fractional distance of interface i to grid pt (i-1), from grid pt i.    
-    
-    varep = np.zeros(N) 
-    for i in range(1,N): 
-        varep[i] = (z[i] - zf[i])/ dz[i]
+	for i in range(N):
+		zfu[i] = zf[i]
+		zfd[i] = zf[i+1]
 
-# > Display setup                
-    
-    return zf,z,Dz,dz,varep,typ,N
+	z = np.zeros(N+1)
 
+	for i in range(1,N):
+		z[i] = 0.5*(zfu[i] + zfd[i])
+
+	z[0] = zf[0]; z[N] = zf[N]
+
+	Dz = np.zeros(N)
+	for i in range(N):
+		Dz[i] = zfd[i] - zfu[i]
+
+	dz = np.zeros(N)
+	for i in range(1,N):
+		dz[i] = z[i] - z[i-1]
+	dz[0] = 10**-10
+
+	varep = np.zeros(N)
+	for i in range(N):
+		varep[i] = (z[i] - zf[i])/dz[i]
+    
+	import matplotlib.pyplot as plt
+	junkx = float('NaN') *np.ones(zfuL.shape)
+	plt.plot(junkx,zfuL)
+	plt.plot(junkx,zfdL)
+	plt.gca().invert_yaxis()
+	v=np.array([0, 1])
+	junk2 = 0.5*(v[1] - v[0] * np.ones(z.shape))
+	plt.ylabel('Depth (m)')
+	plt.title('Physical Layers (blue), CV interfaces (red), CV grid pts (black)')
+	# show physical layers
+	for j in range(0,nlayers):
+		plt.axhline(zfuL[j],0,1,color='b',linewidth=2)
+	plt.axhline(zfdL[j],0,1,color='b',linewidth=2)
+
+	# show CV interfaces
+	for i in range(0,N+1):
+		plt.axhline(zf[i],0,1,color='r')
+	# show CV grid pts
+	for i in range(0,N+1):
+		plt.plot(junk2,z,'o',markerfacecolor = 'k')
+	plt.axis([0,1,z[0]-1,z[N]+1])
+	plt.gca().invert_yaxis()
+	plt.show()
+
+	return zf,z,Dz,dz,varep,typ,N    
              
 def Z_grid(n,zfuL,zfdL,typL,nL,pos):
      
@@ -830,7 +858,7 @@ def source_2p(z,sourceP):
     
     return S
 
-def source_1(N,t,spaceP):
+def source_1(spaceP,N,t):
     
     """This function evaluates the source term during the setup stage.
     It:
@@ -862,9 +890,10 @@ def source_1(N,t,spaceP):
      
     Example
     -------
-    >>> n = 4
-	>>> spaceP = np.ones(n)*0.5
-	>>> source_1(n,1,spaceP)
+    >>> t = 1.0
+    >>> N = 4
+	>>> spaceP = 0.5
+	>>> source_1(t,N,spaceP)
     Out[]: (array([ 0.,  0.,  0.,  0.]), array([ 1.,  1.,  1.,  1.]), 0)
     Note: Ask Gary why he passes t, since it is never used in by the function
     """
@@ -1047,7 +1076,7 @@ def Tprop_1(dummy_var1, materialC, dummy_var2):
     
     typ = materialC[0]
     L=typ[0]
-    print 'idx=',L
+    #print 'idx=',L
 
 # Type 1 material -------
     if L == 1:
@@ -1072,3 +1101,99 @@ def Tprop_1(dummy_var1, materialC, dummy_var2):
 
     return K,rho,Cp,C,diagC
 
+def testCV(N,t,spaceP,TpropP,sourceP,bcP,testP):
+	
+	Tanal = np.zeros(N);  secyr = 86400*365
+	
+	# Unpack cell arrays
+	z = spaceP[1]; Dz = spaceP[2]; dz = spaceP[3]
+	zz = z[0:N] # grid points without the one embedded in lowest interface
+
+	K = TpropP[0]; rho = TpropP[1]; cp = TpropP[2]
+	diffu = K/(rho*cp)
+
+	Jb = bcP[1]; qb = -Jb
+	
+	experim = testP[0];  T0 = testP[1]; dT = testP[2]
+	period = testP[3]
+
+	if experim == 'e1':
+		# SS, fixed temp on upper bnd, fixed flux on lower bnd:
+		#  > T(z,0) = T0 + z*qb/K
+		#  > T(0,t) = T0
+		#  > S(z,t) = 0
+		Tanal = T0 + zz * qb/K
+	
+	elif experim == 'e2':
+		# SS, fixed temperature on upper bnd, fixed flux on lower bnd, 
+		#     with exponential heat production.
+		#     Flux at any depth is equal to integral of S(z) below that depth.
+		#  > T(z,0) = T0 + S0/K *h^2 *[1-exp(-z/h)]
+		#  > T(0,t) = T0
+		#  > S(z,t) = S0*exp(-z/h)    
+
+		S0 = sourceP[0]
+		h = sourceP[1]
+		Tanal = T0 + S0/K * h**2 * (1 - np.exp(-zz/h))
+	
+	elif experim == 'e3':
+		# case 1 but with composite material
+		#  > T(z,0) = piecewise linear
+		#  > T(0,t) = T0
+		#  > S(z,t) = 0
+
+		#    Find interface temperatures by integrating across CVs.  
+		#    Then interpolate to find grid point temperatures.
+	
+		Tf = np.zeros(N+1)
+		Tf[0] = T0
+		for k in range(0,N):
+			Tf[k+1] = Tf[k] + Dz[k] * qb/K[k]
+		#print Tf
+		Tanal[0] = Tf[0]
+		for k in range(1,N):
+			Tanal[k] = 0.5 * (Tf[k] + Tf[k+1])
+
+	elif experim == 'e4':
+		# case 1 but with temperature-dependent conductivity and specific heat
+		#  > T(0,t) = T0
+		#  > S(z,t) = 0
+	
+		K0 = 2
+		dKdT = -0.0140
+		
+		Tanal[0] = T0
+		for k in range(1,N):
+			C = -(2*K0*Tanal[k-1] + dKdT*Tanal[k-1]**2 + 2*qb*dz[k])
+			Tanal[k] = (-K0 + np.sqrt(K0**2 - dKdT*C)) / dKdT;
+		
+	elif experim == 'e5':
+		# Instantaneous step change:
+		#  > T(z,0) = T0 + z*qb/K
+		#  > T(0,t) = T0 + dT
+		#  > S(z,t) = 0
+
+		from math import erf, erfc
+	
+		fac = np.zeros(N); eta = zz/np.sqrt(4*diffu*t)
+
+		for k in range(0,N):
+			if eta[k] < 0.5:
+				fac[k] = 1 - erf(eta[k]);
+			else:
+				fac[k] = erfc(eta[k]);
+
+		Tanal = T0 + zz*qb/K + dT*fac;
+	
+	elif experim == 'e6':
+		# periodic surface temperature:
+		#   > T(0,t)   = T0 + dT*cos(w*t)
+		#   > T(inf,t) = T0
+		#   > S(z,t)   = 0
+
+		lambda_ = secyr*period;
+		w      = 2*np.pi/lambda_;
+		k      = np.sqrt(np.pi/(lambda_*diffu));
+		Tanal  = T0 + dT*np.cos(k*zz - w*t + np.pi/2)*np.exp(-k*zz);
+		
+	return Tanal
